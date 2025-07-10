@@ -1,5 +1,4 @@
 import { productsApi } from "../api/productsApi";
-import { User } from "../interface/user";
 
 export interface AuthResponse {
   id: string;
@@ -11,24 +10,16 @@ export interface AuthResponse {
 }
 
 const returnUserToken = (data: AuthResponse) => {
-  const { id, email, fullName, isActive, roles,token } = data;
-
-  const user : User = {
-    id,
-    email,
-    fullName,
-    isActive,
-    roles,
-  };
+   const { token, ...user } = data;
 
   return {
     user,
-    token
+    token,
   };
 };
 
 export const authLogin = async (email: string, password: string) => {
-  email = email.trim().toLowerCase();
+  email = email.toLowerCase();
   try {
     const { data } = await productsApi.post<AuthResponse>("/auth/login", {
       email,
@@ -45,10 +36,8 @@ export const authLogin = async (email: string, password: string) => {
 export const authCheckStatus = async () => {
   try {
     const { data } = await productsApi.get<AuthResponse>("/auth/check-status");
-    console.log( data);
     return returnUserToken(data);
   } catch (error) {
-    console.log("Error in authCheckStatus:", error);
     return null;
   }
 };
